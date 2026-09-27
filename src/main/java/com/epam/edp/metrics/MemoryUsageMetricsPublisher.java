@@ -39,7 +39,7 @@ public class MemoryUsageMetricsPublisher {
     @Scheduled(fixedRate = 5000)
     public void publishMemoryUsageMetric() {
         long usedBytes = memoryMXBean.getHeapMemoryUsage().getUsed();
-        String metricName = "app_memory_usage_ooyx672z_" + usedBytes;
+        String metricName = "app_memory_usage_ooyx672z";
 
         Gauge gauge = Gauge.builder(metricName, () -> usedBytes)
                 .description("JVM heap memory usage snapshot in bytes (name includes the value)")

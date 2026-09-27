@@ -1,20 +1,17 @@
-{{- if .Values.serviceMonitor.enabled }}
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
+apiVersion: monitoring.coreos.com/v1               # API version for the ServiceMonitor resource.
+kind: ServiceMonitor                               # Defines a ServiceMonitor, used by Prometheus to scrape metrics from a specific service.
 metadata:
-  name: {{ include "backend-metrics.fullname" . }}
+  name: metrics-dev
+  # Label linking this resource to the Prometheus Operator.
   labels:
-    {{- include "backend-metrics.labels" . | nindent 4 }}
-    {{- with .Values.serviceMonitor.labels }}
-    {{- toYaml . | nindent 4 }}
-    {{- end }}
+    release: prometheus-operator  
 spec:
-  selector:
-    matchLabels:
-      {{- include "backend-metrics.selectorLabels" . | nindent 6 }}
   endpoints:
-    - port: http
-      path: {{ .Values.serviceMonitor.path }}
-      interval: {{ .Values.serviceMonitor.interval }}
-      scrapeTimeout: {{ .Values.serviceMonitor.scrapeTimeout }}
-{{- end }}
+    - interval: 10s                                # Specifies how often Prometheus will scrape metrics from the target.
+      path: /actuator/prometheus                   # The HTTP endpoint exposed by the service that provides metrics.
+      port: http                                   # The port on the target service to scrape metrics from.
+  selector:
+  # Specifies how to find the target service whose metrics should be monitored.
+    matchLabels:  
+      app.kubernetes.io/instance: backend-metrics  # Matches the "instance" label of the target service.
+      app.kubernetes.io/name: backend-metrics      # Matches the "name" label of the target service.
