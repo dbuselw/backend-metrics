@@ -39,14 +39,18 @@ A Helm chart for Kubernetes
 | ingress.hosts[0].paths[0].path | string | `"/"` |  |
 | ingress.hosts[0].paths[0].pathType | string | `"ImplementationSpecific"` |  |
 | ingress.tls | list | `[]` |  |
-| livenessProbe.tcpSocket.port | string | `"http"` |  |
+| livenessProbe.httpGet.path | string | `"/actuator/health/liveness"` |  |
+| livenessProbe.httpGet.port | string | `"http"` |  |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` | https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector |
-| podAnnotations | object | `{}` |  |
+| podAnnotations."prometheus.io/path" | string | `"/actuator/prometheus"` |  |
+| podAnnotations."prometheus.io/port" | string | `"8080"` |  |
+| podAnnotations."prometheus.io/scrape" | string | `"true"` |  |
 | podLabels | object | `{}` |  |
 | podSecurityContext | object | `{}` |  |
+| readinessProbe.httpGet.path | string | `"/actuator/health/readiness"` |  |
+| readinessProbe.httpGet.port | string | `"http"` |  |
 | readinessProbe.initialDelaySeconds | int | `20` |  |
-| readinessProbe.tcpSocket.port | string | `"http"` |  |
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
 | securityContext | object | `{}` |  |
@@ -56,6 +60,7 @@ A Helm chart for Kubernetes
 | serviceAccount.automount | bool | `true` | Automatically mount a ServiceAccount's API credentials? |
 | serviceAccount.create | bool | `true` | Specifies whether a service account should be created |
 | serviceAccount.name | string | `""` | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
+| serviceMonitor | object | `{"enabled":false,"interval":"30s","labels":{},"path":"/actuator/prometheus","scrapeTimeout":"10s"}` | Enable if the cluster runs the Prometheus Operator; creates a ServiceMonitor so Prometheus scrapes /actuator/prometheus without relying on pod annotations. |
 | tolerations | list | `[]` | https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/ |
 | volumeMounts | list | `[]` |  |
 | volumes | list | `[]` |  |

@@ -28,7 +28,10 @@ serviceAccount:
   # -- The name of the service account to use. If not set and create is true, a name is generated using the fullname template
   name: ""
 
-podAnnotations: {}
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/path: "/actuator/prometheus"
+  prometheus.io/port: "8080"
 podLabels: {}
 
 podSecurityContext: {}
@@ -77,12 +80,26 @@ resources: {}
   #   memory: 128Mi
 
 livenessProbe:
-  tcpSocket:
+  httpGet:
+    path: /actuator/health/liveness
     port: http
 readinessProbe:
-  tcpSocket:
+  httpGet:
+    path: /actuator/health/readiness
     port: http
   initialDelaySeconds: 20
+
+# -- Enable if the cluster runs the Prometheus Operator; creates a
+# ServiceMonitor so Prometheus scrapes /actuator/prometheus without
+# relying on pod annotations.
+serviceMonitor:
+  enabled: false
+  interval: 30s
+  scrapeTimeout: 10s
+  path: /actuator/prometheus
+  labels: {}
+  # matches the label the Prometheus Operator's serviceMonitorSelector expects, e.g.:
+  # release: prometheus
 
 autoscaling:
   enabled: false
